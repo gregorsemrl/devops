@@ -1,0 +1,93 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device tags="nocreate">
+      <name>{$DEVICE}</name>
+      <config>
+        <vrf xmlns="http://tail-f.com/ned/cisco-ios-xr" tags="merge">
+          <vrf-list>
+            <name>vpn{$VPNID}</name>
+            <address-family>
+              <ipv4>
+                <unicast>
+                  <import>
+                    <route-target>
+                      <address-list>
+                        <name>1:{$VPNID}</name>
+                      </address-list>
+                    </route-target>
+                  </import>
+                  <export>
+                    <route-target>
+                      <address-list>
+                        <name>1:{$VPNID}</name>
+                      </address-list>
+                    </route-target>
+                  </export>
+                </unicast>
+              </ipv4>
+            </address-family>
+          </vrf-list>
+        </vrf>
+        <router xmlns="http://tail-f.com/ned/cisco-ios-xr" tags="merge">
+          <bgp>
+            <bgp-no-instance>
+              <id>1</id>
+              <vrf>
+                <name>vpn{$VPNID}</name>
+                <neighbor>
+                  <id>{$CEIP}</id>
+                  <remote-as>65001</remote-as>
+                  <address-family>
+                    <ipv4>
+                      <unicast>
+                        <route-policy>
+                          <direction>in</direction>
+                          <name>pass</name>
+                        </route-policy>
+                        <route-policy>
+                          <direction>out</direction>
+                          <name>pass</name>
+                        </route-policy>
+                        <as-override/>
+                        <default-originate/>
+                      </unicast>
+                    </ipv4>
+                  </address-family>
+                </neighbor>
+                <address-family>
+                  <ipv4>
+                    <unicast>
+                       <redistribute>
+                         <connected/>
+                         <static/>
+                      </redistribute>
+                    </unicast>
+                  </ipv4>
+                </address-family>
+                <rd>1:{$VPNID}</rd>
+              </vrf>
+            </bgp-no-instance>
+          </bgp>
+        </router>
+        <interface xmlns="http://tail-f.com/ned/cisco-ios-xr" tags="nocreate">
+            <GigabitEthernet>
+                <id>{$INTERFACE}</id>
+                <ipv4 tags="merge">
+                    <address>
+                        <mask>255.255.255.252</mask>
+                        <ip>{$PEIP}</ip>
+                    </address>
+                </ipv4>
+                <vrf tags="create">vpn{$VPNID}</vrf>
+            </GigabitEthernet>
+        </interface>
+        <route-policy xmlns="http://tail-f.com/ned/cisco-ios-xr" tags="merge">
+          <name>pass</name>
+            <cmd>
+              <value>pass</value>
+            </cmd>
+        </route-policy>
+      </config>
+    </device>
+  </devices>
+</config-template>

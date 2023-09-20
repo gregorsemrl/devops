@@ -1,0 +1,14 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <resource-pools xmlns="http://cisco.com/yang/nso/resource-allocator">
+     <id-pool>
+       <name>{$POOL}</name>
+       <allocation>
+         <id>{$ALLOCATIONID}</id>
+         <allocating-service>{$SERVICE}</allocating-service>
+         <request>
+           <sync xmlns="http://cisco.com/yang/nso/id-allocator">{$SYNC}</sync>
+         </request>
+       </allocation>
+     </id-pool>
+  </resource-pools>
+</config>

@@ -1,0 +1,124 @@
+module svi {
+
+  namespace "http://example.com/svi";
+  prefix svi;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+  import tailf-ned-cisco-ios {
+    prefix ios;
+  }
+  import tailf-ned-cisco-nx {
+    prefix nx;
+  }
+
+
+  description "Switch Virtual Interface Service";
+
+  revision 2018-01-01 {
+    description
+      "Initial revision.";
+  }
+
+  augment /ncs:services {
+    list svi {
+      description "This service configures virtual switch interface.";
+      key name;
+
+      leaf name {
+        tailf:info "Service Instance Name";
+        type string;
+      }
+
+      uses ncs:service-data;
+      ncs:servicepoint svi-servicepoint;
+
+
+      list device {
+        tailf:info "L3 switch";
+        key name;
+
+        leaf ip-prefix {
+          tailf:info "Unique IPv4 prefix for VLAN. Device with ip-prefix configured will serve as gateway.";
+          type inet:ipv4-prefix;
+          // Only one device can have ip-prefix configured
+          when "count(../../device[name != current()/../name]/ip-prefix)=0";
+        }
+
+        leaf name {
+          tailf:info "Device name";
+          type leafref {
+            path "/ncs:devices/ncs:device/ncs:name";
+          }
+          must "starts-with(current(),'SW')" {
+            error-message "Only SW devices can be selected.";
+          }
+        }
+
+        /* This device specific containers are here only to show                the versatility of yang and how autocompletion can be provided. Do not use this in production since it breaks the principle of vendor independent service model.*/
+        container ios {
+
+          when "deref(../name)/../ncs:module[1]/ncs:name='tailf-ned-cisco-ios'" {
+            tailf:dependency "../name";
+          }
+
+          tailf:cli-drop-node-name;
+
+          list interface {
+            tailf:info "GigabitEthernet interface";
+            key intf-id;
+
+            leaf intf-id {
+              tailf:info "GigabitEthernet interface ID";
+              type leafref {
+                path "deref(../../../name)/../ncs:config/ios:interface/ios:GigabitEthernet/ios:name";
+              }
+            }
+          }
+        }
+
+        container nx {
+
+          when "deref(../name)/../ncs:module[1]/ncs:name='tailf-ned-cisco-nx'" {
+            tailf:dependency "../name";
+          }
+
+          tailf:cli-drop-node-name;
+
+          list interface {
+            tailf:info "Ethernet interface";
+            key intf-id;
+
+            leaf intf-id {
+              tailf:info "Ethernet interface ID";
+              type leafref {
+                path "deref(../../../name)/../ncs:config/nx:interface/nx:Ethernet/nx:name";
+              }
+            }
+          }
+        }
+
+      }
+    }
+  }
+
+  augment /ncs:services {
+    leaf vlan-id-cnt {
+      description "Provides a unique number used as VLAN identifier";
+      tailf:hidden "Counter";
+      type uint32 {
+        range "2..4096";
+      }
+      default 2;
+    }
+  }
+
+
+}

@@ -1,0 +1,37 @@
+<ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
+  <name>l3mplsvpn</name>
+  <package-version>1.0</package-version>
+  <description>L3 MPLS VPN Python and Template Service</description>
+  <ncs-min-version>4.6</ncs-min-version>
+
+  <component>
+    <name>L3 MPLS VPN</name>
+    <application>
+      <python-class-name>l3mplsvpn.l3mplsvpn.L3MplsVpn</python-class-name>
+    </application>
+  </component>
+
+  <component>
+    <name>Custom Allocator</name>
+    <application>
+      <python-class-name>l3mplsvpn.custom_allocator.l3mplsvpn_subscriber.L3MplsVpnSubscriber</python-class-name>
+    </application>
+  </component>
+
+  <required-package>
+    <name>resource-manager</name>
+  </required-package>
+
+  <required-package>
+    <name>id-allocator-example</name>
+  </required-package>
+
+  <!-- Uncomment for service upgrade lab -->
+  <!--<component>-->
+    <!--<name>upgrade</name>-->
+    <!--<application>-->
+      <!--<python-class-name>l3mplsvpn.upgrade.Main</python-class-name>-->
+    <!--</application>-->
+  <!--</component>-->
+
+</ncs-package>

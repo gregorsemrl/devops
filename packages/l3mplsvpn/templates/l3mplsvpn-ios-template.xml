@@ -1,0 +1,84 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device tags="nocreate">
+      <name>{$DEVICE}</name>
+      <config>
+        <vrf xmlns="urn:ios" tags="merge">
+          <definition>
+            <name>vpn{$VPNID}</name>
+            <address-family>
+              <ipv4 />
+            </address-family>
+            <route-target>
+              <import>
+                <asn-ip>1:{$VPNID}</asn-ip>
+              </import>
+              <export>
+                <asn-ip>1:{$VPNID}</asn-ip>
+              </export>
+            </route-target>
+            <rd>1:{$VPNID}</rd>
+          </definition>
+        </vrf>
+        <router xmlns="urn:ios" tags="merge">
+          <?if {$ROUTING-PROTOCOL='rip'}?>
+          <rip>
+            <address-family>
+              <ipv4>
+                <vrf>
+                  <name>vpn{$VPNID}</name>
+                  <default-information>
+                    <originate/>
+                  </default-information>
+                  <network>
+                    <ip>{$RIP-NET}</ip>
+                  </network>
+                </vrf>
+              </ipv4>
+            </address-family>
+          </rip>
+          <?end?>
+          <?if {$ROUTING-PROTOCOL='bgp'}?>
+          <bgp>
+            <as-no>1</as-no>
+            <address-family>
+              <with-vrf>
+                <ipv4>
+                  <unicast-multicast>unicast</unicast-multicast>
+                  <vrf>
+                    <name>vpn{$VPNID}</name>
+                    <neighbor>
+                      <id>{$CEIP}</id>
+                      <remote-as>65001</remote-as>
+                    </neighbor>
+                    <redistribute>
+                      <connected/>
+                      <static/>
+                    </redistribute>
+                  </vrf>
+                </ipv4>
+              </with-vrf>
+            </address-family>
+          </bgp>
+          <?end?>
+        </router>
+        <interface xmlns="urn:ios" tags="nocreate">
+          <GigabitEthernet>
+            <name>{$INTERFACE}</name>
+            <vrf tags="create">
+              <forwarding>vpn{$VPNID}</forwarding>
+            </vrf>
+            <ip tags="merge">
+              <address>
+                <primary>
+                  <address>{$PEIP}</address>
+                  <mask>255.255.255.252</mask>
+                </primary>
+              </address>
+            </ip>
+          </GigabitEthernet>
+        </interface>
+      </config>
+    </device>
+  </devices>
+</config-template>

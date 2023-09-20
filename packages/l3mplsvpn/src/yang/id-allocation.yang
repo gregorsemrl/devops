@@ -1,0 +1,27 @@
+module id-allocation {
+  namespace "http://example.com/id-allocation";
+  prefix id-allocation;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  description "Structure to keep track of requests for allocation and deallocation of ids.";
+
+  list l3mplsvpn-requests {
+    key service-path;
+
+    leaf service-path {
+      type string;
+    }
+
+    leaf allocated-id {
+      type uint32;
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
+    }
+
+  }
+}

@@ -1,0 +1,31 @@
+module id-database {
+  namespace "http://example.com/id-database";
+  prefix id-database;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  description "Structure for keeping track of allocated ids. In real world this would usually be some external
+    inventory system.";
+
+  container id-database {
+    leaf start {
+      type uint32;
+      default 100;
+    }
+
+    leaf stop {
+      type uint32;
+      default 200;
+    }
+
+    leaf-list used-ids {
+      type uint32;
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }
+    }
+  }
+}

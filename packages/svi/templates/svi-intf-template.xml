@@ -1,0 +1,40 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+
+    <!-- DEVICE -->
+    <device tags="nocreate">
+      <name>{$SVI-DEVICE}</name>
+      <config>
+
+        <!-- IOS -->
+        <interface xmlns="urn:ios">
+          <Vlan tags="merge">
+            <name>{$VLAN-ID}</name>
+            <ip>
+              <address>
+                <primary>
+                  <address>{$IP-ADDR}</address>
+                  <mask>{$NETMASK}</mask>
+                </primary>
+              </address>
+            </ip>
+          </Vlan>
+        </interface>
+
+        <!-- NX-OS -->
+        <feature xmlns="http://tail-f.com/ned/cisco-nx" tags="merge">
+          <interface-vlan/>
+        </feature>
+        <interface xmlns="http://tail-f.com/ned/cisco-nx">
+          <Vlan tags="merge">
+            <name>{$VLAN-ID}</name>
+            <ip>
+              <address>{$IP-PREFIX}</address>
+            </ip>
+          </Vlan>
+        </interface>
+
+      </config>
+    </device>
+  </devices>
+</config-template>
